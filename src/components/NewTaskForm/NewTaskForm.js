@@ -1,94 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
 import propTypes from 'prop-types';
+
 import './NewTaskForm.css';
 
-export default class NewTaskForm extends React.Component {
-  static propTypes = {
-    addItem: propTypes.func,
-  };
+function NewTaskForm({ addItem }) {
+  const [label, setLabel] = useState('');
+  const [minutes, setMinutes] = useState('');
+  const [seconds, setSeconds] = useState('');
 
-  state = {
-    label: '',
-    minutes: '',
-    seconds: '',
-  };
-
-  onLabelChange = (element) => {
+  const onLabelChange = (element) => {
     if (element.target.value.length < 10) {
-      this.setState({
-        label: element.target.value,
-      });
+      setLabel(element.target.value);
     }
   };
 
-  changeMinutes = (event) => {
-    this.setState({ minutes: event.target.value });
+  const changeMinutes = (event) => {
+    setMinutes(event.target.value);
   };
 
-  changeSeconds = (event) => {
-    this.setState({ seconds: event.target.value });
+  const changeSeconds = (event) => {
+    setSeconds(event.target.value);
   };
 
-  render() {
-    const { label, minutes, seconds } = this.state;
-    // const onSubmit = (element) => {
-    //   element.preventDefault();
-    //   if (this.state.label.length > 0 && !this.state.label[0].match(/\s/)) {
-    //     this.props.addItem(this.state.label, this.state.minutes, this.state.seconds);
-    //   }
-    //   this.setState({
-    //     label: '',
-    //     minutes: '',
-    //     seconds: '',
-    //   });
-    // };
-    const onSubmit = (event) => {
-      if (event.key === 'Enter') {
-        if (this.state.label.length > 0 && !this.state.label[0].match(/\s/)) {
-          this.props.addItem(label, minutes, seconds);
-          this.setState({
-            label: '',
-            minutes: '',
-            seconds: '',
-          });
-        }
+  const onSubmit = (event) => {
+    if (event.key === 'Enter') {
+      if (label.length > 0 && !label[0].match(/\s/)) {
+        addItem(label, minutes, seconds);
+        setLabel('');
+        setMinutes('');
+        setSeconds('');
       }
-    };
+    }
+  };
 
-    return (
-      <header id="todoapp-header" className="header">
-        <h1>todos</h1>
-        <form className="new-todo-form">
-          <input
-            type="text"
-            className="new-todo"
-            placeholder="What needs to be done?"
-            onChange={this.onLabelChange}
-            value={label}
-            minLength={1}
-            required
-            onKeyDown={onSubmit}
-          />
-          <input
-            type="text"
-            className="new-todo-form__timer"
-            placeholder="Min"
-            autoFocus
-            value={this.state.minutes}
-            onChange={this.changeMinutes}
-            onKeyDown={onSubmit}
-          />
-          <input
-            type="text"
-            className="new-todo-form__timer"
-            placeholder="Sec"
-            autoFocus
-            value={this.state.seconds}
-            onChange={this.changeSeconds}
-            onKeyDown={onSubmit}
-          />
-        </form>
-      </header>
-    );
-  }
+  return (
+    <header id="todoapp-header" className="header">
+      <h1>todos</h1>
+      <form className="new-todo-form">
+        <input
+          type="text"
+          className="new-todo"
+          placeholder="What needs to be done?"
+          onChange={onLabelChange}
+          value={label}
+          minLength={1}
+          required
+          onKeyDown={onSubmit}
+        />
+        <input
+          type="text"
+          className="new-todo-form__timer"
+          placeholder="Min"
+          autoFocus
+          value={minutes}
+          onChange={changeMinutes}
+          onKeyDown={onSubmit}
+        />
+        <input
+          type="text"
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          autoFocus
+          value={seconds}
+          onChange={changeSeconds}
+          onKeyDown={onSubmit}
+        />
+      </form>
+    </header>
+  );
 }
+export default NewTaskForm;
+NewTaskForm.propTypes = {
+  addItem: propTypes.func,
+};

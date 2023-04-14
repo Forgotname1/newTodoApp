@@ -1,74 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './App.css';
 import NewTaskForm from '../NewTaskForm';
 import TaskList from '../TaskList';
 import Footer from '../Footer';
 
-export default class App extends React.Component {
-  maxId = 1;
+function App() {
+  let maxId = 1;
+  const [todoData, setTodoData] = useState([]);
+  const [filter, setFilter] = useState('all');
 
-  state = {
-    todoData: [],
-    filter: 'all',
-  };
-
-  createTodoItem(label, minutes, seconds) {
+  const createTodoItem = (label, minutes, seconds) => {
     return {
       label,
       important: false,
       done: false,
       created: Date.now(),
-      id: this.maxId++,
+      id: maxId++,
       edit: false,
       time: Number(minutes) * 60 + Number(seconds),
     };
-  }
+  };
 
-  addItem = (text, minutes, seconds) => {
-    const newItem = this.createTodoItem(text, minutes, seconds);
-    this.setState(({ todoData }) => {
+  const addItem = (text, minutes, seconds) => {
+    const newItem = createTodoItem(text, minutes, seconds);
+    setTodoData(() => {
       const newArray = [...todoData, newItem];
-      return { todoData: newArray };
+      return newArray;
     });
   };
 
-  deleteItem = (id) => {
-    this.setState(({ todoData }) => {
+  const deleteItem = (id) => {
+    setTodoData(() => {
       const idx = todoData.findIndex((el) => el.id === id);
       const newArray = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
-      return {
-        todoData: newArray,
-      };
+      return newArray;
     });
   };
 
-  onToggleDone = (id) => {
-    this.setState((state) => ({ todoData: this.toggleProperty(state.todoData, id, 'done') }));
+  const onToggleDone = (id) => {
+    setTodoData(toggleProperty(todoData, id, 'done'));
   };
 
-  onToggleEdit = (id) => {
-    this.setState((state) => ({ todoData: this.toggleProperty(state.todoData, id, 'edit') }));
+  const onToggleEdit = (id) => {
+    setTodoData(toggleProperty(todoData, id, 'edit'));
   };
 
-  toggleProperty(arr, id, propName) {
+  const toggleProperty = (arr, id, propName) => {
     const idx = arr.findIndex((el) => el.id === id);
     const oldItem = arr[idx];
     const newItem = { ...oldItem, [propName]: !oldItem[propName] };
     return [...arr.slice(0, idx), newItem, ...arr.slice(idx + 1)];
-  }
-
-  onToggleVisible = (selector) => {
-    this.setState(() => ({ filter: selector }));
   };
 
-  onToggleSelect = (btn) => {
-    this.setState(() => ({ filter: btn }));
-    this.onToggleVisible(btn);
+  const onToggleVisible = (selector) => {
+    setFilter(selector);
   };
 
-  showList = (visible) => {
-    const { todoData } = this.state;
+  const onToggleSelect = (btn) => {
+    setFilter(btn);
+    onToggleVisible(btn);
+  };
+
+  const showList = (visible) => {
     switch (visible) {
       case 'all':
         return todoData;
@@ -79,37 +73,34 @@ export default class App extends React.Component {
     }
   };
 
-  deleteCompleted = () => {
-    this.setState(({ todoData }) => {
+  const deleteCompleted = () => {
+    setTodoData(() => {
       const newArr = todoData.filter((data) => !data.done);
-      return { todoData: newArr };
+      return newArr;
     });
   };
-
-  render() {
-    const { todoData, filter } = this.state;
-    const doneCount = todoData.filter((el) => el.done).length;
-    const todoCount = todoData.length - doneCount;
-    const visibleList = this.showList(filter);
-    return (
-      <div className={'todoapp'}>
-        <NewTaskForm addItem={this.addItem} />
-        <TaskList
-          todos={visibleList}
-          todoCount={todoCount}
-          onToggleDone={this.onToggleDone}
-          onDeleted={this.deleteItem}
-          onToggleEdit={this.onToggleEdit}
-          addItem={this.addItem}
-        />
-        <Footer
-          filter={filter}
-          todoCount={todoCount}
-          deleteCompleted={this.deleteCompleted}
-          onToggleVisible={this.onToggleVisible}
-          onToggleSelect={this.onToggleSelect}
-        />
-      </div>
-    );
-  }
+  const doneCount = todoData.filter((el) => el.done).length;
+  const todoCount = todoData.length - doneCount;
+  const visibleList = showList(filter);
+  return (
+    <div className={'todoapp'}>
+      <NewTaskForm addItem={addItem} />
+      <TaskList
+        todos={visibleList}
+        todoCount={todoCount}
+        onToggleDone={onToggleDone}
+        onDeleted={deleteItem}
+        onToggleEdit={onToggleEdit}
+        addItem={addItem}
+      />
+      <Footer
+        filter={filter}
+        todoCount={todoCount}
+        deleteCompleted={deleteCompleted}
+        onToggleVisible={onToggleVisible}
+        onToggleSelect={onToggleSelect}
+      />
+    </div>
+  );
 }
+export default App;
