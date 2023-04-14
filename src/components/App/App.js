@@ -13,7 +13,7 @@ export default class App extends React.Component {
     filter: 'all',
   };
 
-  createTodoItem(label) {
+  createTodoItem(label, minutes, seconds) {
     return {
       label,
       important: false,
@@ -21,11 +21,12 @@ export default class App extends React.Component {
       created: Date.now(),
       id: this.maxId++,
       edit: false,
+      time: Number(minutes) * 60 + Number(seconds),
     };
   }
 
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text);
+  addItem = (text, minutes, seconds) => {
+    const newItem = this.createTodoItem(text, minutes, seconds);
     this.setState(({ todoData }) => {
       const newArray = [...todoData, newItem];
       return { todoData: newArray };
